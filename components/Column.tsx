@@ -4,6 +4,7 @@ import { PlusCircleIcon } from '@heroicons/react/16/solid';
 import TodoCard from './TodoCard';
 import { useBoardStore } from '@/store/BoardStore';
 import { useDebounce } from '@/hooks/useDebounce';
+import { useModalStore } from '@/store/ModalStore';
 
 interface Props {
   id: TypedColumn;
@@ -20,7 +21,8 @@ const idToColumnText: {
 }
 
 function Column({ id, index, todos }: Props) {
-  const [searchString] = useBoardStore((state) => [state.searchString]);
+  const [searchString, setNewTaskType] = useBoardStore((state) => [state.searchString, state.setNewTaskType]);
+  const [openModal] = useModalStore((state) => [state.openModal]);
 
   const query = useDebounce(searchString, 500);
 
@@ -28,6 +30,11 @@ function Column({ id, index, todos }: Props) {
     if (!searchString) return todos;
     return todos.filter((todo) => todo.title.toLowerCase().includes(searchString.toLowerCase()))
   }, [query, todos])
+
+  const handleTodo = () => {
+    setNewTaskType(id);
+    openModal()
+  }
 
   return (
     <Draggable draggableId={id} index={index}>
@@ -80,7 +87,7 @@ function Column({ id, index, todos }: Props) {
                   {provided.placeholder}
 
                   <div className='flex flex-end justify-end p-2'>
-                    <button className='text-green-500 hover:text-green-600'>
+                    <button onClick={openModal} className='text-green-500 hover:text-green-600'>
                       <PlusCircleIcon className='h-10 w-10' />
                     </button>
                   </div>
