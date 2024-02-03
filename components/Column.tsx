@@ -1,7 +1,9 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 import { Draggable, Droppable } from '@hello-pangea/dnd';
 import { PlusCircleIcon } from '@heroicons/react/16/solid';
 import TodoCard from './TodoCard';
+import { useBoardStore } from '@/store/BoardStore';
+import { useDebounce } from '@/hooks/useDebounce';
 
 interface Props {
   id: TypedColumn;
@@ -18,6 +20,15 @@ const idToColumnText: {
 }
 
 function Column({ id, index, todos }: Props) {
+  const [searchString] = useBoardStore((state) => [state.searchString]);
+
+  const query = useDebounce(searchString, 500);
+
+  const filteredTodos = useMemo(() => {
+    if (!searchString) return todos;
+    return todos.filter((todo) => todo.title.toLowerCase().includes(searchString.toLowerCase()))
+  }, [query, todos])
+
   return (
     <Draggable draggableId={id} index={index}>
       {(provided) => (
@@ -43,12 +54,12 @@ function Column({ id, index, todos }: Props) {
                   className='flex justify-between font-bold text-xl p-2'
                 >{idToColumnText[id]}
                   <span className='text-gray-500 bg-gray-200 rounded-full px-2 py-1 text-sm font-normal'>
-                    {todos.length}
+                    {filteredTodos.length}
                   </span>
                 </h2>
 
                 <div className='space-y-2'>
-                  {todos.map((todo, index) => (
+                  {filteredTodos.map((todo, index) => (
                     <Draggable
                       key={todo.$id}
                       draggableId={todo.$id}
