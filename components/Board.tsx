@@ -3,12 +3,14 @@ import { useBoardStore } from '@/store/BoardStore';
 import React, { useEffect } from 'react'
 import { DragDropContext, DropResult, Droppable } from '@hello-pangea/dnd';
 import Column from './Column';
+import { useAuthStore } from '@/store/AuthStore';
 
 function Board() {
-    const [board, getBoard, setBoardState,updateTodoInDB] = useBoardStore((state) => [state.board, state.getBoard, state.setBoardState, state.updateTodoInDB])
+    const [board, getBoard, setBoardState, updateTodoInDB] = useBoardStore((state) => [state.board, state.getBoard, state.setBoardState, state.updateTodoInDB])
+    const user = useAuthStore((state) => state.user)
     useEffect(() => {
-        getBoard()
-    }, [getBoard])
+        getBoard(user?.$id ?? "")
+    }, [getBoard, user])
 
     const handleOnDragEnd = (result: DropResult) => {
         const { source, destination, type } = result;
@@ -76,7 +78,7 @@ function Board() {
                     todos: finishTodos
                 });
 
-                updateTodoInDB(todoMoved,endCol.id)
+                updateTodoInDB(todoMoved, endCol.id)
                 setBoardState({ ...board, columns: newColumns });
 
 

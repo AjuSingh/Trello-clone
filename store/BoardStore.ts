@@ -9,7 +9,7 @@ interface BoardState {
     newTaskInput: string;
     newTaskType: TypedColumn;
     image: File | null;
-    getBoard: () => void;
+    getBoard: (userId?: string) => void;
     setBoardState: (board: Board) => void;
     updateTodoInDB: (todo: Todo, typeId: TypedColumn) => void;
     setSearchString: (searchString: string) => void;
@@ -17,15 +17,15 @@ interface BoardState {
     setNewTaskInput: (input: string) => void;
     setNewTaskType: (type: TypedColumn) => void;
     setImage: (image: File | null) => void;
-    addTask: (todo: string, columnId: TypedColumn, image?: File | null) => void;
+    addTask: (todo: string, columnId: TypedColumn, user: User | null, image?: File | null) => void;
 }
 
 export const useBoardStore = create<BoardState>((set, get) => ({
     board: {
         columns: new Map<TypedColumn, Column>()
     },
-    getBoard: async () => {
-        const board = await getTodosGroupedByColumns();
+    getBoard: async (userId?: string) => {
+        const board = await getTodosGroupedByColumns(userId);
         set({ board })
     },
     setBoardState: (board) => set({ board }),
@@ -66,7 +66,9 @@ export const useBoardStore = create<BoardState>((set, get) => ({
     setNewTaskType: (type: TypedColumn) => set({ newTaskType: type }),
     image: null,
     setImage: (image: File | null) => set({ image }),
-    addTask: async (task: string, columnId: TypedColumn, image?: File | null) => {
+    addTask: async (task: string, columnId: TypedColumn, user: User | null, image?: File | null) => {
+        if (!user) return;
+
         let file: Image | undefined;
         if (image) {
             const fileUploaded = await uploadImage(image);
@@ -83,6 +85,7 @@ export const useBoardStore = create<BoardState>((set, get) => ({
             process.env.NEXT_PUBLIC_COLLECTION_ID!,
             ID.unique(),
             {
+                user_id: user.$id,
                 title: task,
                 status: columnId,
                 ...(file && { image: JSON.stringify(file) })
