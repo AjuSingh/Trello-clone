@@ -21,4 +21,11 @@ interface Image {
     fileId: string;
 }
 
+
+interface User {
+    $id: string;
+    email: string;
+    name: string;
+}
+
 type TypedColumn = "todo" | "inprogress" | "done"

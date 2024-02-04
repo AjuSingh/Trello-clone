@@ -1,10 +1,12 @@
 import { Database } from "@/appwrite"
+import { Query } from "appwrite";
 
 
 
 
-export const getTodosGroupedByColumns = async () => {
-    const data = await Database.listDocuments(process.env.NEXT_PUBLIC_DATABASE_ID!, process.env.NEXT_PUBLIC_COLLECTION_ID!);
+export const getTodosGroupedByColumns = async (userId?: string) => {
+    const data = await Database.listDocuments(process.env.NEXT_PUBLIC_DATABASE_ID!, process.env.NEXT_PUBLIC_COLLECTION_ID!, userId ?
+        [Query.equal('user_id', userId)] : [Query.equal('user_id', "")]);
 
     const todos = data.documents;
     const columns = todos.reduce((acc, todo) => {
@@ -39,13 +41,13 @@ export const getTodosGroupedByColumns = async () => {
     }
 
     const sortColumns = new Map(
-        Array.from(columns.entries()).sort((a,b)=>{
+        Array.from(columns.entries()).sort((a, b) => {
             return colTypes.indexOf(a[0]) - colTypes.indexOf(b[0]);
         })
     )
 
-    const board:Board = {
-        columns : sortColumns,
+    const board: Board = {
+        columns: sortColumns,
     }
 
     return board;

@@ -6,25 +6,26 @@ import { useBoardStore } from '@/store/BoardStore';
 import TaskTypeRadioGroup from './TaskTypeRadioGroup';
 import Image from 'next/image';
 import { PhotoIcon } from '@heroicons/react/16/solid';
+import { useAuthStore } from '@/store/AuthStore';
 
 function Modal() {
+
     const [isOpen, closeModal] = useModalStore((state) => [state.isOpen, state.closeModal]);
     const [addTask, newTaskInput, setNewTaskInput, image, setImage, newTaskType] = useBoardStore((state) => [state.addTask, state.newTaskInput, state.setNewTaskInput, state.image, state.setImage, state.newTaskType]);
-
+    const user = useAuthStore((state) => state.user)
     const imagePickerRef = useRef<HTMLInputElement>(null)
 
     const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         if (!newTaskInput) return;
 
-        await addTask(newTaskInput, newTaskType, image)
+        await addTask(newTaskInput, newTaskType,user, image)
 
         setImage(null);
         closeModal()
     }
 
     return (
-        // Use the `Transition` component at the root level
         <Transition appear show={isOpen} as={Fragment}>
             <Dialog as='form' onSubmit={e => handleSubmit(e)} onClose={() => closeModal()} className={`relative z-10`}>
 

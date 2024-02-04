@@ -5,6 +5,8 @@ import TodoCard from './TodoCard';
 import { useBoardStore } from '@/store/BoardStore';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useModalStore } from '@/store/ModalStore';
+import { useAuthStore } from '@/store/AuthStore';
+import { useAuthModalStore } from '@/store/AuthModal';
 
 interface Props {
   id: TypedColumn;
@@ -23,6 +25,8 @@ const idToColumnText: {
 function Column({ id, index, todos }: Props) {
   const [searchString, setNewTaskType] = useBoardStore((state) => [state.searchString, state.setNewTaskType]);
   const [openModal] = useModalStore((state) => [state.openModal]);
+  const [user] = useAuthStore((state) => [state.user])
+  const openAuthModal = useAuthModalStore((state) => state.openModal)
 
   const query = useDebounce(searchString, 500);
 
@@ -32,6 +36,10 @@ function Column({ id, index, todos }: Props) {
   }, [query, todos])
 
   const handleTodo = () => {
+    if (!user) {
+      openAuthModal()
+      return;
+    }
     setNewTaskType(id);
     openModal()
   }
@@ -87,7 +95,7 @@ function Column({ id, index, todos }: Props) {
                   {provided.placeholder}
 
                   <div className='flex flex-end justify-end p-2'>
-                    <button onClick={openModal} className='text-green-500 hover:text-green-600'>
+                    <button onClick={handleTodo} className='text-green-500 hover:text-green-600'>
                       <PlusCircleIcon className='h-10 w-10' />
                     </button>
                   </div>

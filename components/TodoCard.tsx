@@ -1,6 +1,8 @@
 "use client"
 
 import getUrl from '@/lib/getUrl';
+import { useAuthModalStore } from '@/store/AuthModal';
+import { useAuthStore } from '@/store/AuthStore';
 import { useBoardStore } from '@/store/BoardStore';
 import { DraggableProvidedDragHandleProps, DraggableProvidedDraggableProps } from '@hello-pangea/dnd';
 import { XCircleIcon } from '@heroicons/react/16/solid';
@@ -20,7 +22,17 @@ type Props = {
 function TodoCard({ todo, dragHandleProps, draggableProps, id, index, innerRef }: Props) {
 
     const deleteTask = useBoardStore((state) => state.deleteTask);
-    const [imageUrl, setImageUrl] = useState<string | null>("")
+    const [imageUrl, setImageUrl] = useState<string | null>("");
+    const user = useAuthStore((state) => state.user);
+    const openAuthModal = useAuthModalStore((state) => state.openModal)
+
+    const handleDeletTask = () => {
+        if (!user) {
+            openAuthModal()
+            return;
+        }
+        deleteTask(index, todo, id)
+    }
 
     useEffect(() => {
         if (todo.image) {
@@ -42,7 +54,7 @@ function TodoCard({ todo, dragHandleProps, draggableProps, id, index, innerRef }
             ref={innerRef}>
             <div className='flex justify-between items-center p-5'>
                 <p>{todo.title}</p>
-                <button onClick={() => deleteTask(index, todo, id)} className='text-red-500 hover:text-red-600'>
+                <button onClick={handleDeletTask} className='text-red-500 hover:text-red-600'>
                     <XCircleIcon className='ml-5 h-8 w-8' />
                 </button>
             </div>

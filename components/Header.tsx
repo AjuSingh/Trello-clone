@@ -1,8 +1,9 @@
 "use client";
 
 import { fetchSuggesstion } from '@/lib/fetchSuggestion';
+import { useAuthStore } from '@/store/AuthStore';
 import { useBoardStore } from '@/store/BoardStore';
-import { MagnifyingGlassIcon, UserCircleIcon } from '@heroicons/react/16/solid'
+import { ArrowLeftEndOnRectangleIcon, MagnifyingGlassIcon, UserCircleIcon } from '@heroicons/react/16/solid'
 import Image from 'next/image'
 import React, { useEffect, useState } from 'react'
 import Avatar from 'react-avatar'
@@ -12,6 +13,12 @@ function Header() {
   const [board, searchString, setSearchString] = useBoardStore((state) => [state.board, state.searchString, state.setSearchString]);
   const [loading, setLoading] = useState<Boolean>(false)
   const [suggestion, setSuggestion] = useState<String>("");
+  const [user, getAccount, handleLogout] = useAuthStore((state) => [state.user, state.getAccount, state.logoutUser])
+
+
+  useEffect(() => {
+    getAccount()
+  }, [])
 
   useEffect(() => {
     if (board.columns.size === 0) return;
@@ -64,7 +71,14 @@ function Header() {
             />
             <button type="submit" hidden>Search</button>
           </form>
-          <Avatar name='Ajvinder Singh' round color='#0055D1' size='50' />
+          <Avatar name={user && user.name ? user.name : 'John Doe'} round color='#0055D1' size='50' />
+          {user && (<button
+            onClick={handleLogout} // Add your logout function here
+            className='text-gray-500 hover:text-gray-700 focus:outline-none focus:ring focus:border-blue-300'
+          >
+            <ArrowLeftEndOnRectangleIcon className='w-6 h-6' />
+          </button>)
+          }
         </div>
       </div>
 
