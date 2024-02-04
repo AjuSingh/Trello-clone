@@ -1,6 +1,7 @@
 import { Database, ID, storage } from '@/appwrite';
 import { getTodosGroupedByColumns } from '@/lib/getTodosGroupedByColumn';
 import uploadImage from '@/lib/uploadImage';
+import { toast } from 'react-hot-toast';
 import { create } from 'zustand'
 
 interface BoardState {
@@ -59,6 +60,7 @@ export const useBoardStore = create<BoardState>((set, get) => ({
             process.env.NEXT_PUBLIC_COLLECTION_ID!,
             todo.$id
         );
+        toast.success('Task deleted successfully!')
     },
     newTaskInput: "",
     setNewTaskInput: (input: string) => set({ newTaskInput: input }),
@@ -119,6 +121,7 @@ export const useBoardStore = create<BoardState>((set, get) => ({
                 }
             }
         })
+        toast.success('Task added successfully!')
     }
 
 }))
