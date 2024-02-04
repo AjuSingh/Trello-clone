@@ -6,8 +6,8 @@ import { Toaster } from "react-hot-toast";
 
 
 export const metadata: Metadata = {
-  title: "Trello Clone",
-  description: "Clone by Ajvinder Singh",
+  title: "Trello 2.0",
+  description: "",
 };
 
 export default function RootLayout({
