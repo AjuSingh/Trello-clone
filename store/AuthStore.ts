@@ -1,5 +1,6 @@
 import { Database, ID, account } from "@/appwrite";
 import { Query } from "appwrite";
+import { toast } from "react-hot-toast";
 import { create } from "zustand";
 
 interface AuthState {
@@ -40,12 +41,14 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
             await account.createEmailSession(email, password);
             set({ user: await account.get() })
-        } catch (err) {
-            console.log(err);
+            toast.success('Logged in successfully!');
+        } catch (err: any) {
+            toast.error(err.message);
         }
     },
     logoutUser: async () => {
         await account.deleteSession('current');
         set({ user: null })
+        toast.success('Logged out successfully!');
     }
 }))
